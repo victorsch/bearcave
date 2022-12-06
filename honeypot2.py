@@ -17,17 +17,21 @@ print("Welcome to the fake Linux terminal honeypot")
 fake_dir = "/"
 
 logs = []
+existing_log = ""
 
 # Get the current date
 now = datetime.now()
 date = now.strftime("%m-%d-%Y")
 
-log_file = f"logs-{date}.json"
+log_file = f"logs/logs-{date}.json"
 if not os.path.exists(log_file):
     with open(log_file, "w") as f:
         # Initialize the log file with an empty list of logs
         f.write("")
-    
+else:
+  existing_log = json.loads(open(log_file, "r+").read())
+  for log in existing_log:
+    logs.append(log)
 while True:
   # Display the current working directory
   print(f"{fake_dir}$ ", end="")
@@ -86,6 +90,6 @@ while True:
   # with open(f"logs-{date}.json", "a") as f:
   #   json.dump(log, f)
 
-f = open(log_file, "a")
+f = open(log_file, "w")
 json.dump(logs, f)
 f.close()
