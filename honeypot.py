@@ -11,7 +11,7 @@ files = ["bin", "dev", "etc", "home", "lib", "lib64", "media", "mnt", "opt", "pr
 fake_users = ["alice", "bob", "chris", "dave", "eve", "frank", "grace", "hannah", "ian", "jessica"]
 
 # Print a welcome message
-print("Welcome to the fake Linux terminal honeypot")
+print("Last login: Tue Dec  6 22:21:49 2022")
 
 # Set the initial fake directory to the root directory
 fake_dir = "/"
