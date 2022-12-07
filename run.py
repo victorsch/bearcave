@@ -55,69 +55,70 @@ conn, addr = sock.accept()
 conn.send("Last login: Tue Dec  6 22:21:49 2022 \n".encode())
     
 while True:
-  # Display the current working directory
-  conn.send(f"{fake_dir}$ ".encode())
+  try:
+    # Display the current working directory
+    conn.send(f"{fake_dir}$ ".encode())
 
-  # Get the command from the user
-  cmd = conn.recv(1024).decode()
+    # Get the command from the user
+    cmd = conn.recv(1024).decode()
 
-  # Split the command into tokens
-  tokens = cmd.split()
+    # Split the command into tokens
+    tokens = cmd.split()
 
-  # Check if the user wants to exit
-  if cmd == "exit":
-    break
-  
-  if (len(tokens) != 0):
-    # If the user entered the "ls" command, print a list of common Linux files
-    if tokens[0] == "ls":
-      if fake_dir == "/home":
-        # If the fake_dir is in the home directory, print the fake users
-        for user in fake_users:
-          conn.send((user + " ").encode())
-      else:
-        # Otherwise, print the common Linux files
-        for file in files:
-          conn.send((file + " ").encode())
-      conn.send("\n".encode())
+    # Check if the user wants to exit
+    if cmd == "exit":
+      break
+    
+    if (len(tokens) != 0):
+      # If the user entered the "ls" command, print a list of common Linux files
+      if tokens[0] == "ls":
+        if fake_dir == "/home":
+          # If the fake_dir is in the home directory, print the fake users
+          for user in fake_users:
+            conn.send((user + " ").encode())
+        else:
+          # Otherwise, print the common Linux files
+          for file in files:
+            conn.send((file + " ").encode())
+        conn.send("\n".encode())
 
-    # If the user entered the "cd" command, pretend to change the working directory
-    elif tokens[0] == "cd":
-      if len(tokens) == 1:
-        # If no directory was specified, pretend to go to the home directory
-        fake_dir = "/home"
-        conn.send((fake_dir + "\n").encode())
-      elif tokens[1] == "..":
-          # If the user specified "..", pretend to move back to the parent directory
-          fake_dir = "/"
+      # If the user entered the "cd" command, pretend to change the working directory
+      elif tokens[0] == "cd":
+        if len(tokens) == 1:
+          # If no directory was specified, pretend to go to the home directory
+          fake_dir = "/home"
+          conn.send((fake_dir + "\n").encode())
+        elif tokens[1] == "..":
+            # If the user specified "..", pretend to move back to the parent directory
+            fake_dir = "/"
+            conn.send(fake_dir.encode())
+        elif tokens[1] in files:
+          # If a valid directory was specified, pretend to go to that directory
+          fake_dir = f"/{tokens[1]}"
           conn.send(fake_dir.encode())
-      elif tokens[1] in files:
-        # If a valid directory was specified, pretend to go to that directory
-        fake_dir = f"/{tokens[1]}"
-        conn.send(fake_dir.encode())
+        else:
+          # If an invalid directory was specified, print an error message
+          conn.send("No such file or directory \n".encode())
+        
+      # If the user entered the "whoami" command, print the current user
+      elif tokens[0] == "whoami":
+        conn.send(f"{fake_user}\n".encode())
+        
       else:
-        # If an invalid directory was specified, print an error message
-        conn.send("No such file or directory \n".encode())
-      
-    # If the user entered the "whoami" command, print the current user
-    elif tokens[0] == "whoami":
-      conn.send(f"{fake_user}\n".encode())
-      
+        # If the user entered an invalid command, print an error message
+        conn.send("Command not found \n".encode())
     else:
-      # If the user entered an invalid command, print an error message
-      conn.send("Command not found \n".encode())
-  else:
-    conn.send("\n".encode())
-  # Log the user input to a json file
-  now = datetime.now()
-  date = now.strftime("%m-%d-%Y")
-  log = {
-    "date": date,
-    "input": cmd
-  }
-  logs.append(log)
-  # with open(f"logs-{date}.json", "a") as f:
-  #   json.dump(log, f)
+      conn.send("\n".encode())
+    # Log the user input to a json file
+    now = datetime.now()
+    date = now.strftime("%m-%d-%Y")
+    log = {
+      "date": date,
+      "input": cmd
+    }
+    logs.append(log)
+  except BrokenPipeError as e:
+    pass
 
 f = open(log_file, "w")
 json.dump(logs, f)
