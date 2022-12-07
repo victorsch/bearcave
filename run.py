@@ -50,7 +50,7 @@ sock.listen(1)
 
 # Accept incoming connections
 conn, addr = sock.accept()  
-conn.send("Last login: Tue Dec  6 22:21:49 2022".encode())
+conn.send("Last login: Tue Dec  6 22:21:49 2022 \n".encode())
     
 while True:
   # Display the current working directory
@@ -72,12 +72,12 @@ while True:
       if fake_dir == "/home":
         # If the fake_dir is in the home directory, print the fake users
         for user in fake_users:
-          conn.send(user.encode())
+          conn.send((user + " ").encode())
       else:
         # Otherwise, print the common Linux files
         for file in files:
-          conn.send(file.encode())
-      conn.send("".encode())
+          conn.send((file + " ").encode())
+      conn.send("\n".encode())
 
     # If the user entered the "cd" command, pretend to change the working directory
     elif tokens[0] == "cd":
@@ -95,12 +95,12 @@ while True:
         conn.send(fake_dir.encode())
       else:
         # If an invalid directory was specified, print an error message
-        conn.send("No such file or directory".encode())
+        conn.send("No such file or directory \n".encode())
     else:
       # If the user entered an invalid command, print an error message
-      conn.send("Command not found".encode())
+      conn.send("Command not found \n".encode())
   else:
-    conn.send("")
+    conn.send("\n".encode())
   # Log the user input to a json file
   now = datetime.now()
   date = now.strftime("%m-%d-%Y")
