@@ -46,14 +46,14 @@ sock.listen(1)
 
 # Accept incoming connections
 conn, addr = sock.accept()  
-conn.send()
+conn.send("Last login: Tue Dec  6 22:21:49 2022".encode())
     
 while True:
   # Display the current working directory
   print(f"{fake_dir}$ ", end="")
 
   # Get the command from the user
-  cmd = conn.recv(1024).decode("Last login: Tue Dec  6 22:21:49 2022".encode())
+  cmd = conn.recv(1024).decode()
 
   # Split the command into tokens
   tokens = cmd.split()
