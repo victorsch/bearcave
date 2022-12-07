@@ -52,6 +52,7 @@ sock.listen(1)
 
 # Accept incoming connections
 conn, addr = sock.accept()  
+print("Received connection from ")
 conn.send("Last login: Tue Dec  6 22:21:49 2022 \n".encode())
     
 while True:
@@ -67,8 +68,11 @@ while True:
 
     # Check if the user wants to exit
     if cmd == "exit":
+      sock.close()
       break
     
+    print("Printing response to command: {cmd}")
+        
     if (len(tokens) != 0):
       # If the user entered the "ls" command, print a list of common Linux files
       if tokens[0] == "ls":
@@ -118,7 +122,10 @@ while True:
     }
     logs.append(log)
   except BrokenPipeError as e:
-    pass
+    f = open(log_file, "w")
+    json.dump(logs, f)
+    f.close()
+    break
 
 f = open(log_file, "w")
 json.dump(logs, f)
