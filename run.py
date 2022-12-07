@@ -30,10 +30,13 @@ if not os.path.exists(log_file):
         # Initialize the log file with an empty list of logs
         f.write("")
 else:
-  existing_log = json.loads(open(log_file, "r+").read())
-  if (len(existing_log) != 0):
-    for log in existing_log:
-      logs.append(log)
+  try:
+    existing_log = json.loads(open(log_file, "r+").read())
+    if (len(existing_log) != 0):
+      for log in existing_log:
+        logs.append(log)
+  except json.decoder.JSONDecodeError as e:
+    pass
     
     
 # Create a socket
