@@ -54,7 +54,7 @@ conn.send("Last login: Tue Dec  6 22:21:49 2022".encode())
     
 while True:
   # Display the current working directory
-  print(f"{fake_dir}$ ", end="")
+  conn.send(f"{fake_dir}$ ".encode())
 
   # Get the command from the user
   cmd = conn.recv(1024).decode()
@@ -72,34 +72,35 @@ while True:
       if fake_dir == "/home":
         # If the fake_dir is in the home directory, print the fake users
         for user in fake_users:
-          print(user, end="  ")
+          conn.send(user.encode())
       else:
         # Otherwise, print the common Linux files
         for file in files:
-          print(file, end="  ")
-      print()
+          conn.send(file.encode())
+      conn.send("".encode())
 
     # If the user entered the "cd" command, pretend to change the working directory
     elif tokens[0] == "cd":
       if len(tokens) == 1:
         # If no directory was specified, pretend to go to the home directory
         fake_dir = "/home"
-        print(fake_dir)
+        conn.send(fake_dir.encode())
       elif tokens[1] == "..":
           # If the user specified "..", pretend to move back to the parent directory
           fake_dir = "/"
-          print(fake_dir)
+          conn.send(fake_dir.encode())
       elif tokens[1] in files:
         # If a valid directory was specified, pretend to go to that directory
         fake_dir = f"/{tokens[1]}"
-        print(fake_dir)
+        conn.send(fake_dir.encode())
       else:
         # If an invalid directory was specified, print an error message
-        print("No such file or directory")
+        conn.send("No such file or directory".encode())
     else:
       # If the user entered an invalid command, print an error message
-      print("Command not found")
-
+      conn.send("Command not found".encode())
+  else:
+    conn.send("")
   # Log the user input to a json file
   now = datetime.now()
   date = now.strftime("%m-%d-%Y")
