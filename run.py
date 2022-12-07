@@ -17,6 +17,8 @@ print("Awaiting connection...")
 # Set the initial fake directory to the root directory
 fake_dir = "/"
 
+fake_user = "root"
+
 logs = []
 existing_log = ""
 
@@ -96,6 +98,11 @@ while True:
       else:
         # If an invalid directory was specified, print an error message
         conn.send("No such file or directory \n".encode())
+      
+    # If the user entered the "whoami" command, print the current user
+    elif tokens[0] == "whoami":
+      conn.send(f"{fake_user}\n".encode())
+      
     else:
       # If the user entered an invalid command, print an error message
       conn.send("Command not found \n".encode())
