@@ -86,7 +86,7 @@ while True:
       if len(tokens) == 1:
         # If no directory was specified, pretend to go to the home directory
         fake_dir = "/home"
-        conn.send(fake_dir.encode())
+        conn.send((fake_dir + "\n").encode())
       elif tokens[1] == "..":
           # If the user specified "..", pretend to move back to the parent directory
           fake_dir = "/"
