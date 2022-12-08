@@ -236,6 +236,7 @@ def emulate_shell(conn, remote_addr):
       data = b""
       while not data.endswith(b"\n"):
         chunk = conn.recv(1024)
+        print(chunk)
         data += chunk
         if not chunk:
             continue
