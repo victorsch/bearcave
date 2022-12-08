@@ -235,7 +235,7 @@ def emulate_shell(conn, remote_addr):
       # Get the command from the user
       data = b""
       while not data.endswith(b"\n"):
-        cmd = conn.recv(1024)
+        chunk = conn.recv(1024)
         data += chunk
         if not chunk:
             continue
@@ -243,7 +243,7 @@ def emulate_shell(conn, remote_addr):
       #cmd = f.readline().strip("\r\n")
     
       # Split the command into tokens
-      tokens = cmd.split()
+      tokens = data.decode().split()
 
       # Check if the user wants to exit
       if cmd == "exit":
