@@ -244,7 +244,8 @@ def emulate_shell(conn, remote_addr):
       #cmd = f.readline().strip("\r\n")
     
       # Split the command into tokens
-      tokens = data.decode().split()
+      cmd = data.decode()
+      tokens = cmd.split()
 
       # Check if the user wants to exit
       if cmd == "exit":
