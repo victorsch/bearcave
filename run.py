@@ -230,12 +230,12 @@ def emulate_shell(conn, remote_addr):
   while True:
     try:
       # Display the current working directory
-      conn.send(f"{fake_dir}$ ")
+      conn.send(f"\r\n\r\n{fake_dir}$ ")
 
       # Get the command from the user
-      #cmd = conn.recv(1024).decode()
-      f = conn.makefile("rU")
-      cmd = f.readline().strip("\r\n")
+      cmd = conn.recv(1024).decode()
+      #f = conn.makefile("rU")
+      #cmd = f.readline().strip("\r\n")
     
       # Split the command into tokens
       tokens = cmd.split()
@@ -245,7 +245,7 @@ def emulate_shell(conn, remote_addr):
         conn.close()
         return True
       
-      print("Printing response to command: {cmd}")
+      print(f"Printing response to command: {cmd}")
           
       if (len(tokens) != 0):
         # If the user entered the "ls" command, print a list of common Linux files
