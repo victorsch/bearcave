@@ -234,7 +234,7 @@ def emulate_shell(conn, remote_addr):
 
       # Get the command from the user
       data = b""
-      while not data.endswith(b"\n"):
+      while not data.endswith(b"\r"):
         chunk = conn.recv(1024)
         print(chunk)
         data += chunk
