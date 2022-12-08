@@ -129,7 +129,7 @@ except Exception as e:
 print("Got a connection!")
 
 try:
-    t = paramiko.Transport(client, gss_kex=DoGSSAPIKeyExchange)
+    t = paramiko.Transport(client, gss_kex=False)
     t.set_gss_host(socket.getfqdn(""))
     try:
         t.load_server_moduli()
