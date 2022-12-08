@@ -225,7 +225,7 @@ def emulate_shell(conn, remote_addr):
 
   fake_user = "root"
   
-  conn.send("Last login: Tue Dec  6 22:21:49 2022 \n")
+  conn.send("Last login: Tue Dec  6 22:21:49 2022 \r\n\r\n")
   
   while True:
     try:
@@ -233,8 +233,10 @@ def emulate_shell(conn, remote_addr):
       conn.send(f"{fake_dir}$ ")
 
       # Get the command from the user
-      cmd = conn.recv(1024).decode()
-
+      #cmd = conn.recv(1024).decode()
+      f = conn.makefile("rU")
+      cmd = f.readline().strip("\r\n")
+    
       # Split the command into tokens
       tokens = cmd.split()
 
@@ -330,6 +332,6 @@ if __name__ == "__main__":
   clean_exit = True
   while clean_exit:
     connHandle, remote_addr = wait_ssh_connection()
-    print("Session initiated with {remote_addr}")
+    print(f"Session initiated with {remote_addr}")
     clean_exit = emulate_shell(connHandle, remote_addr)
     close_log_session()
