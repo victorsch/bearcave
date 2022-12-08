@@ -225,12 +225,12 @@ def emulate_shell(conn, remote_addr):
 
   fake_user = "root"
   
-  conn.send("Last login: Tue Dec  6 22:21:49 2022 \n".encode())
+  conn.send("Last login: Tue Dec  6 22:21:49 2022 \n")
   
   while True:
     try:
       # Display the current working directory
-      conn.send(f"{fake_dir}$ ".encode())
+      conn.send(f"{fake_dir}$ ")
 
       # Get the command from the user
       cmd = conn.recv(1024).decode()
@@ -309,6 +309,12 @@ def emulate_shell(conn, remote_addr):
       return True
     except ConnectionResetError as e:
       print("Connection was reset.")
+      f = open(log_file, "w")
+      json.dump(logs, f)
+      f.close()
+      return True
+    except KeyboardInterrupt as e:
+      print("Connection was broken.")
       f = open(log_file, "w")
       json.dump(logs, f)
       f.close()
