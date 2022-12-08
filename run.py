@@ -152,7 +152,7 @@ def wait_ssh_connection():
       sys.exit(1)
 
   try:
-      sock.listen(100)
+      sock.listen(1)
       print("Listening for connection ...")
       client, addr = sock.accept()
   except Exception as e:
@@ -179,7 +179,7 @@ def wait_ssh_connection():
         sys.exit(1)
 
     # wait for auth
-    chan = t.accept(20)
+    chan = t.accept()
     if chan is None:
         print("*** No channel.")
         sys.exit(1)
@@ -314,7 +314,7 @@ def emulate_shell(conn, remote_addr):
       f.close()
       return True
     except KeyboardInterrupt as e:
-      print("Connection was broken.")
+      print("Connection was interrupted by keyboard.")
       f = open(log_file, "w")
       json.dump(logs, f)
       f.close()
