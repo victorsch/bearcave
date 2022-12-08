@@ -131,17 +131,84 @@ def wait_connection():
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   # Bind the socket to a port
   sock.bind(("localhost", 8080))
-  
   # Print status to console
   print("Awaiting connection...")
-  
   # Listen for incoming connections
   sock.listen(1)
-  
   # Accept incoming connections
   conn, addr = sock.accept() 
   print("Received connection from ")
   return conn, addr
+
+def wait_ssh_connection():
+  # now connect
+  try:
+      sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+      sock.bind(("", 2222))
+  except Exception as e:
+      print("*** Bind failed: " + str(e))
+      traceback.print_exc()
+      sys.exit(1)
+
+  try:
+      sock.listen(100)
+      print("Listening for connection ...")
+      client, addr = sock.accept()
+  except Exception as e:
+      print("*** Listen/accept failed: " + str(e))
+      traceback.print_exc()
+      sys.exit(1)
+
+  print("Got a connection!")
+  
+  try:
+    t = paramiko.Transport(client, gss_kex=False)
+    t.set_gss_host(socket.getfqdn(""))
+    try:
+        t.load_server_moduli()
+    except:
+        print("(Failed to load moduli -- gex will be unsupported.)")
+        raise
+    t.add_server_key(host_key)
+    server = Server()
+    try:
+        t.start_server(server=server)
+    except paramiko.SSHException:
+        print("*** SSH negotiation failed.")
+        sys.exit(1)
+
+    # wait for auth
+    chan = t.accept(20)
+    if chan is None:
+        print("*** No channel.")
+        sys.exit(1)
+    print("Authenticated!")
+
+    server.event.wait(10)
+    if not server.event.is_set():
+        print("*** Client never asked for a shell.")
+        sys.exit(1)
+    return client, addr
+    # chan.send("\r\n\r\nWelcome to my dorky little BBS!\r\n\r\n")
+    # chan.send(
+    #     "We are on fire all the time!  Hooray!  Candy corn for everyone!\r\n"
+    # )
+    # chan.send("Happy birthday to Robot Dave!\r\n\r\n")
+    # chan.send("Username: ")
+    # f = chan.makefile("rU")
+    # username = f.readline().strip("\r\n")
+    # chan.send("\r\nI don't like you, " + username + ".\r\n")
+    # chan.close()
+
+  except Exception as e:
+      print("*** Caught exception: " + str(e.__class__) + ": " + str(e))
+      traceback.print_exc()
+      try:
+          t.close()
+      except:
+          pass
+      sys.exit(1)
   
 def emulate_shell(conn, remote_addr):
   session_guid = str(uuid.uuid1())
@@ -252,77 +319,10 @@ def emulate_shell(conn, remote_addr):
 # Main function
 if __name__ == "__main__":
   
-  # now connect
-  try:
-      sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-      sock.bind(("", 2222))
-  except Exception as e:
-      print("*** Bind failed: " + str(e))
-      traceback.print_exc()
-      sys.exit(1)
-
-  try:
-      sock.listen(100)
-      print("Listening for connection ...")
-      client, addr = sock.accept()
-  except Exception as e:
-      print("*** Listen/accept failed: " + str(e))
-      traceback.print_exc()
-      sys.exit(1)
-
-  print("Got a connection!")
   
-  try:
-    t = paramiko.Transport(client, gss_kex=False)
-    t.set_gss_host(socket.getfqdn(""))
-    try:
-        t.load_server_moduli()
-    except:
-        print("(Failed to load moduli -- gex will be unsupported.)")
-        raise
-    t.add_server_key(host_key)
-    server = Server()
-    try:
-        t.start_server(server=server)
-    except paramiko.SSHException:
-        print("*** SSH negotiation failed.")
-        sys.exit(1)
-
-    # wait for auth
-    chan = t.accept(20)
-    if chan is None:
-        print("*** No channel.")
-        sys.exit(1)
-    print("Authenticated!")
-
-    server.event.wait(10)
-    if not server.event.is_set():
-        print("*** Client never asked for a shell.")
-        sys.exit(1)
-
-    chan.send("\r\n\r\nWelcome to my dorky little BBS!\r\n\r\n")
-    chan.send(
-        "We are on fire all the time!  Hooray!  Candy corn for everyone!\r\n"
-    )
-    chan.send("Happy birthday to Robot Dave!\r\n\r\n")
-    chan.send("Username: ")
-    f = chan.makefile("rU")
-    username = f.readline().strip("\r\n")
-    chan.send("\r\nI don't like you, " + username + ".\r\n")
-    chan.close()
-
-  except Exception as e:
-      print("*** Caught exception: " + str(e.__class__) + ": " + str(e))
-      traceback.print_exc()
-      try:
-          t.close()
-      except:
-          pass
-      sys.exit(1)
   
   clean_exit = True
   while clean_exit:
-    connHandle, remote_addr = wait_connection()
+    connHandle, remote_addr = wait_ssh_connection()
     clean_exit = emulate_shell(connHandle, remote_addr)
     close_log_session()
