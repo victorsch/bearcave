@@ -230,7 +230,7 @@ def emulate_shell(conn, remote_addr):
   while True:
     try:
       # Display the current working directory
-      conn.send(f"\r\n\r\n{fake_dir}$ ")
+      conn.send(f"\r\n{fake_dir}$ ")
 
       # Get the command from the user
       #cmd = conn.recv(1024).decode()
