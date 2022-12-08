@@ -128,20 +128,6 @@ def close_log_session():
   except json.decoder.JSONDecodeError as e:
     pass
     
-def wait_connection():
-  # Create a socket
-  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-  # Bind the socket to a port
-  sock.bind(("localhost", 8080))
-  # Print status to console
-  print("Awaiting connection...")
-  # Listen for incoming connections
-  sock.listen(1)
-  # Accept incoming connections
-  conn, addr = sock.accept() 
-  print("Received connection from ")
-  return conn, addr
-
 def wait_ssh_connection():
   # now connect
   try:
@@ -192,16 +178,6 @@ def wait_ssh_connection():
         print("*** Client never asked for a shell.")
         sys.exit(1)
     return chan, addr, t.get_username()
-    # chan.send("\r\n\r\nWelcome to my dorky little BBS!\r\n\r\n")
-    # chan.send(
-    #     "We are on fire all the time!  Hooray!  Candy corn for everyone!\r\n"
-    # )
-    # chan.send("Happy birthday to Robot Dave!\r\n\r\n")
-    # chan.send("Username: ")
-    # f = chan.makefile("rU")
-    # username = f.readline().strip("\r\n")
-    # chan.send("\r\nI don't like you, " + username + ".\r\n")
-    # chan.close()
 
   except Exception as e:
       print("*** Caught exception: " + str(e.__class__) + ": " + str(e))
