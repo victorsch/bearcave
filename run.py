@@ -234,7 +234,7 @@ def emulate_shell(conn, remote_addr):
 
       # Get the command from the user
       #cmd = conn.recv(1024).decode()
-      f = conn.makefile("rU")
+      f = conn.makefile("")
       cmd = f.readline().strip("\r\n")
     
       # Split the command into tokens
