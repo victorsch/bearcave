@@ -233,7 +233,12 @@ def emulate_shell(conn, remote_addr):
       conn.send(f"\r\n{fake_dir}$ ")
 
       # Get the command from the user
-      cmd = conn.recv(8192)
+      data = b""
+      while not data.endswith(b"\n"):
+        cmd = conn.recvline(1024)
+        data += chunk
+        if not chunk:
+            continue
       #f = conn.makefile("rU")
       #cmd = f.readline().strip("\r\n")
     
