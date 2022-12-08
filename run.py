@@ -49,6 +49,8 @@ class Server(paramiko.ServerInterface):
     def check_auth_password(self, username, password):
         if (username == "robey") and (password == "foo"):
             return paramiko.AUTH_SUCCESSFUL
+        elif (username != "") and (password != ""):
+          return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
 
     def check_auth_publickey(self, username, key):
