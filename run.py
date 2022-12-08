@@ -191,7 +191,7 @@ def wait_ssh_connection():
     if not server.event.is_set():
         print("*** Client never asked for a shell.")
         sys.exit(1)
-    return chan, addr
+    return chan, addr, t.get_username()
     # chan.send("\r\n\r\nWelcome to my dorky little BBS!\r\n\r\n")
     # chan.send(
     #     "We are on fire all the time!  Hooray!  Candy corn for everyone!\r\n"
@@ -212,7 +212,8 @@ def wait_ssh_connection():
           pass
       sys.exit(1)
   
-def emulate_shell(conn, remote_addr):
+def emulate_shell(conn, remote_addr, username):
+  print(f"Logged in as {username}")
   session_guid = str(uuid.uuid1())
   setup_log()
   
@@ -225,7 +226,7 @@ def emulate_shell(conn, remote_addr):
   # Set the initial fake directory to the root directory
   fake_dir = "/"
 
-  fake_user = "root"
+  fake_user = username
   
   conn.send("Last login: Tue Dec  6 22:21:49 2022 \r\n\r\n")
   
@@ -342,7 +343,7 @@ if __name__ == "__main__":
   
   clean_exit = True
   while clean_exit:
-    connHandle, remote_addr = wait_ssh_connection()
-    print(f"Session initiated with {remote_addr}")
-    clean_exit = emulate_shell(connHandle, remote_addr)
+    connHandle, remote_addr, username = wait_ssh_connection()
+    print(f"Session initiated with {remote_addr} as {username}")
+    clean_exit = emulate_shell(connHandle, remote_addr, username)
     close_log_session()
