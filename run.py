@@ -269,6 +269,19 @@ def emulate_shell(conn, remote_addr, username):
         # If the user entered the "whoami" command, print the current user
         elif tokens[0] == "whoami":
           conn.send(f"{fake_user}\n".encode())
+        elif tokens[0] == "wget":
+          if len(tokens) != 2:
+            conn.send(f"You must provide a url!\n".encode())
+          else:
+            conn.send(f"Unable to fetch resource: {tokens[1]}\n".encode())
+            file_log = {
+              "log_guid": str(uuid.uuid1()),
+              "session_guid": session_guid,
+              "date": date,
+              "remote_addr": str(remote_addr[0]),
+              "remote_url": cmd
+            }
+            logs.append(file_log)
         elif tokens[0] == "exit":
           conn.close()
           return True
