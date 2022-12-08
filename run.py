@@ -248,6 +248,8 @@ def emulate_shell(conn, remote_addr):
       print(f"Printing response to command: {cmd}")
           
       if (len(tokens) != 0):
+        first_command = tokens[0]
+        conn.send("\r\n\r\n")
         # If the user entered the "ls" command, print a list of common Linux files
         if tokens[0] == "ls":
           if fake_dir == "/home":
@@ -289,7 +291,7 @@ def emulate_shell(conn, remote_addr):
           return False
         else:
           # If the user entered an invalid command, print an error message
-          conn.send("Command not found \n".encode())
+          conn.send(f"-bash: {first_command}: command not found \n".encode())
       else:
         conn.send("\n".encode())
       # Log the user input to a json file
