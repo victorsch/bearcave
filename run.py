@@ -189,7 +189,7 @@ def wait_ssh_connection():
     if not server.event.is_set():
         print("*** Client never asked for a shell.")
         sys.exit(1)
-    return client, addr
+    return chan, addr
     # chan.send("\r\n\r\nWelcome to my dorky little BBS!\r\n\r\n")
     # chan.send(
     #     "We are on fire all the time!  Hooray!  Candy corn for everyone!\r\n"
@@ -324,5 +324,6 @@ if __name__ == "__main__":
   clean_exit = True
   while clean_exit:
     connHandle, remote_addr = wait_ssh_connection()
+    print("Session initiated with {remote_addr}")
     clean_exit = emulate_shell(connHandle, remote_addr)
     close_log_session()
